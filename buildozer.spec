@@ -20,3 +20,4 @@ android.permissions = INTERNET
 android.archs = arm64-v8a, armeabi-v7a
 orientation = portrait
 android.orientation = portrait
+android.orientations = portrait
