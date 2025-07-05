@@ -1,5 +1,5 @@
 [app]
-title = Fint_it
+title = Find_it
 package.name = monappkivymd
 package.domain = org.example
 source.dir = .
@@ -17,3 +17,4 @@ ndk = 25b
 sdk = 34
 android.permissions = INTERNET
 android.archs = arm64-v8a, armeabi-v7a
+orientation = portrait
