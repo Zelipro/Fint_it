@@ -1,150 +1,141 @@
-name: Build KivyMD APK
-
+name: Build Android App
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-android:
+    name: Build for Android
+    runs-on: ubuntu-20.04  # Version spécifique pour plus de stabilité
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.9'
+      - name: Checkout
+        uses: actions/checkout@v4
         
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          git \
-          unzip \
-          zip \
-          openjdk-17-jdk \
-          python3-pip \
-          python3-dev \
-          python3-setuptools \
-          python3-venv \
-          python3-distutils \
-          libssl-dev \
-          libffi-dev \
-          libncurses5-dev \
-          libncursesw5-dev \
-          libtinfo5 \
-          cmake \
-          libfreetype6-dev \
-          libgl1-mesa-dev \
-          libgles2-mesa-dev \
-          libdrm-dev \
-          libxkbcommon-dev \
-          libxrandr-dev \
-          libxss-dev \
-          libgconf-2-4 \
-          libxtst6 \
-          libxrender1 \
-          libfontconfig1 \
-          libdbus-1-3 \
-          libgtk-3-0 \
-          libxslt-dev \
-          zlib1g-dev \
-          libjpeg-dev \
-          libtiff-dev \
-          libsdl2-dev \
-          libsdl2-image-dev \
-          libsdl2-mixer-dev \
-          libsdl2-ttf-dev \
-          libportmidi-dev \
-          libswscale-dev \
-          libavformat-dev \
-          libavcodec-dev \
-          libfreetype6-dev
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
           
-    - name: Setup Java Environment
-      run: |
-        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-        echo "/usr/lib/jvm/java-17-openjdk-amd64/bin" >> $GITHUB_PATH
-        
-    - name: Verify Java Installation
-      run: |
-        java -version
-        javac -version
-        echo "JAVA_HOME: $JAVA_HOME"
-        
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade setuptools wheel
-        pip install buildozer cython==0.29.36
-        pip install kivy kivymd
-        
-    - name: Create necessary directories
-      run: |
-        mkdir -p ~/.buildozer
-        mkdir -p .buildozer
-        
-    - name: Setup Buildozer
-      run: |
-        buildozer --version
-        
-    - name: Cache Buildozer global directory
-      uses: actions/cache@v4
-      with:
-        path: ~/.buildozer
-        key: ${{ runner.os }}-buildozer-global-${{ hashFiles('buildozer.spec') }}
-        restore-keys: |
-          ${{ runner.os }}-buildozer-global-
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           
-    - name: Cache Buildozer directory
-      uses: actions/cache@v4
-      with:
-        path: .buildozer
-        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
-        restore-keys: |
-          ${{ runner.os }}-buildozer-
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip openjdk-11-jdk python3-pip \
+            autoconf libtool pkg-config zlib1g-dev \
+            libncurses5-dev libncursesw5-dev libtinfo5 \
+            cmake libffi-dev libssl-dev \
+            build-essential ccache m4 libtool \
+            libffi-dev libssl-dev libpng-dev libjpeg-dev
           
-    - name: Verify project files
-      run: |
-        echo "Project structure:"
-        find . -name "*.py" -o -name "*.kv" -o -name "*.jpg" -o -name "*.png" | head -20
-        echo "Main files:"
-        ls -la main.py main.kv Prof.jpg 2>/dev/null || echo "Some files missing"
-        
-    - name: Build APK
-      env:
-        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-        ANDROID_HOME: /home/runner/.buildozer/android/platform/android-sdk
-        ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
-        PATH: /usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH
-      run: |
-        buildozer android debug
-        
-    - name: List build output
-      run: |
-        echo "Build directory contents:"
-        ls -la bin/ 2>/dev/null || echo "No bin directory"
-        find . -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
-        
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: kivymd-app-debug
-        path: bin/*.apk
-        if-no-files-found: warn
-        
-    - name: Upload build logs on failure
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-logs
-        path: |
-          .buildozer/android/platform/build-*/logs/
-          .buildozer/android/platform/python-for-android/
-        if-no-files-found: ignore
+      - name: Setup Java
+        run: |
+          echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+          echo "/usr/lib/jvm/java-11-openjdk-amd64/bin" >> $GITHUB_PATH
+          
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install buildozer
+          pip install kivy
+          pip install cython
+          
+      - name: Verify project structure
+        run: |
+          echo "=== PROJECT STRUCTURE ==="
+          find . -type f -name "*.py" -o -name "*.kv" -o -name "*.txt" -o -name "*.png" -o -name "*.jpeg" | head -20
+          echo "=== MAIN.PY CONTENT ==="
+          if [ -f "main.py" ]; then
+            head -10 main.py
+          else
+            echo "❌ main.py not found!"
+            exit 1
+          fi
+          
+      - name: Create buildozer.spec
+        run: |
+          cat > buildozer.spec << 'EOF'
+          [app]
+          title = Mon App
+          package.name = monapp
+          package.domain = org.example
+          source.dir = .
+          source.include_exts = py,png,jpg,jpeg,kv,atlas,txt
+          source.include_patterns = Flags/*,Reso/*,*.png,*.jpeg,*.txt,*.kv
+          version = 0.1
+          requirements = python3,kivy
+          
+          [buildozer]
+          log_level = 2
+          warn_on_root = 1
+          
+          [app:android]
+          arch = arm64-v8a
+          api = 31
+          minapi = 21
+          sdk = 31
+          ndk = 23c
+          gradle_dependencies = 
+          accept_sdk_license = True
+          
+          [app:android.permissions]
+          android.permissions = INTERNET,ACCESS_NETWORK_STATE
+          EOF
+          
+      - name: Build with Buildozer (with timeout)
+        timeout-minutes: 45
+        run: |
+          export ANDROID_SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
+          export ANDROID_NDK_ROOT="$HOME/.buildozer/android/platform/android-ndk-r23c"
+          buildozer android debug --verbose
+          
+      - name: Find and display APK info
+        id: find_apk
+        run: |
+          echo "=== SEARCHING FOR APK ==="
+          find . -name "*.apk" -type f
+          APK_PATH=$(find . -name "*.apk" -type f | head -1)
+          if [ -z "$APK_PATH" ]; then
+            echo "❌ No APK found!"
+            echo "=== BUILD DIRECTORY CONTENT ==="
+            find . -name "bin" -type d -exec ls -la {} \;
+            exit 1
+          fi
+          echo "✅ APK found at: $APK_PATH"
+          ls -lah "$APK_PATH"
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-package
+          path: ${{ steps.find_apk.outputs.apk_path }}
+          retention-days: 30
+          
+      - name: Upload to Release (if tag)
+        if: startsWith(github.ref, 'refs/tags/') && success()
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.find_apk.outputs.apk_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Debug on failure
+        if: failure()
+        run: |
+          echo "=== BUILD FAILED - DEBUG INFO ==="
+          echo "Buildozer log:"
+          cat ~/.buildozer/logs/buildozer.log || echo "No buildozer log found"
+          echo "=== CHECKING DIRECTORIES ==="
+          ls -la
+          find . -name "*.log" -exec echo "=== {} ===" \; -exec cat {} \;
