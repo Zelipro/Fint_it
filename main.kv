@@ -1,0 +1,89 @@
+Screen:
+    MDNavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation:"vertical"
+                    MDTopAppBar:
+                        title:"Find it"
+                        left_action_items:[["menu",lambda x : Nav_drawer.set_state("toggle")]]
+                        right_action_items:[["weather-night-partly-cloudy",lambda x : app.Change(x)]]
+                    Widget:
+
+                MDLabel:
+                    text:"Find a number beetween 1-1000"
+                    halign:"center"
+                    pos_hint: {'center_y':0.6 }
+                    font_style: "H5"
+                    theme_text_color:"Custom"
+                    text_color:app.theme_cls.primary_color
+                MDTextField:
+                    id:Entry
+                    hint_text:"Enter the number"
+                    helper_text:"The maxinum is 1000"
+                    helper_text_mode:"on_focus"
+                    icon_right:"numeric"
+                    input_filter:"int"
+                    halign:"center"
+                    pos_hint: {'center_x': 0.5, 'center_y':0.5 }
+                    size_hint_x:None
+                    width: 300
+                MDRectangleFlatButton:
+                    text:"[b]Go ![/b]"
+                    pos_hint: {'center_x': 0.5, 'center_y':0.4 }
+                    on_release:app.Go(self)
+                
+                MDRectangleFlatButton:
+                    id:Score
+                    text:"[b]0[/b]"
+                    pos_hint: {'center_x': 0.9, 'center_y':0.85}
+                    on_release:app.Score(self)
+        
+        MDNavigationDrawer:
+            id:Nav_drawer
+            MDBoxLayout:
+                orientation:"vertical"
+                spacing:5
+                padding:10
+                Image:
+                    source:"Prof.jpg"
+                MDLabel:
+                    text:"    Elisco"
+                    font_style:'Subtitle1'
+                    bold:True
+                    theme_text_color:"Custom"
+                    text_color:app.theme_cls.primary_color
+                    size_hint_y:None
+                    height:self.texture_size[1]
+                MDLabel:
+                    text:"     eliseeatikpo10@gmail.com"
+                    font_style:"Caption"
+                    size_hint_y:None
+                    bold:True
+                    height:self.texture_size[1]
+
+                ScrollView:
+                    MDList:
+                        OneLineIconListItem:
+                            text:"About as"
+                            theme_text_color:"Custom"
+                            text_color:app.theme_cls.primary_color
+                            on_release: app.Option_List(self)
+                            IconLeftWidget:
+                                icon:"information"
+                        OneLineIconListItem:
+                            text:"Help"
+                            theme_text_color:"Custom"
+                            text_color:app.theme_cls.primary_color
+                            on_release: app.Option_List(self)
+                            IconLeftWidget:
+                                icon:"help"
+                        OneLineIconListItem:
+                            theme_text_color:"Custom"
+                            text_color:(1,0,0,1)
+                            text:"Leave"
+                            on_release: app.Option_List(self)
+                            IconLeftWidget:
+                                icon:"close"
+                            
+                        
