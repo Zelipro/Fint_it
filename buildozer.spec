@@ -6,6 +6,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 requirements = python3,kivy,kivymd,pillow
+icon.filename = %(source.dir)s/Logo.png
 
 [buildozer]
 log_level = 2
