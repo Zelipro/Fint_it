@@ -4,7 +4,7 @@ package.name = Find_it_application
 package.domain = org.example
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
-version = 1.0
+version = 0.1
 requirements = python3,kivy,kivymd,pillow
 icon.filename = %(source.dir)s/Logo.png
 
@@ -18,5 +18,5 @@ ndk = 25b
 sdk = 34
 android.permissions = INTERNET
 android.archs = arm64-v8a, armeabi-v7a
-orientation = portrait
-android.orientation = portrait
+orientation = all
+android.orientation = all
