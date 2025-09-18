@@ -4,7 +4,7 @@ package.name = Find_it_application
 package.domain = org.example
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
-version = 1.2
+version = 1.5
 requirements = python3,kivy,kivymd,pillow
 icon.filename = %(source.dir)s/Logo.png
 
